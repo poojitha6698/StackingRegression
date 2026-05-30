@@ -88,7 +88,7 @@ base_learners = [
 
         RandomForestRegressor(
 
-            n_estimators=100,
+            n_estimators=20,
 
             random_state=42
         )
@@ -99,7 +99,7 @@ base_learners = [
 
         GradientBoostingRegressor(
 
-            n_estimators=100,
+            n_estimators=20,
 
             random_state=42
         )
@@ -110,7 +110,7 @@ base_learners = [
 
         ExtraTreesRegressor(
 
-            n_estimators=100,
+            n_estimators=20,
 
             random_state=42
         )

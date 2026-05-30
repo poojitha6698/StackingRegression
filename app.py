@@ -55,7 +55,9 @@ except Exception as e:
         'Retraining model automatically...'
     )
 
-    import models.train_model
+    model = joblib.load(
+        'models/stacking_regression_model.pkl'
+    )
 
     model = joblib.load(
         MODEL_PATH
