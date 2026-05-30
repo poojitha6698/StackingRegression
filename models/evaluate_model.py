@@ -1,7 +1,9 @@
 import sys
 import os
 
-# Add project root directory to Python path
+# ==========================================
+# ADD PROJECT ROOT DIRECTORY TO PYTHON PATH
+# ==========================================
 
 sys.path.append(
     os.path.abspath(
@@ -12,6 +14,10 @@ sys.path.append(
     )
 )
 
+# ==========================================
+# IMPORT LIBRARIES
+# ==========================================
+
 from sklearn.model_selection import (
     train_test_split
 )
@@ -21,6 +27,7 @@ from sklearn.pipeline import (
 )
 
 from sklearn.metrics import (
+
     r2_score,
     mean_absolute_error,
     mean_squared_error
@@ -45,9 +52,9 @@ from src.feature_engineering import (
     perform_feature_engineering
 )
 
-# =========================
+# ==========================================
 # LOAD DATASET
-# =========================
+# ==========================================
 
 df = load_dataset(
     'insurance.csv'
@@ -55,17 +62,17 @@ df = load_dataset(
 
 print('\nDataset Loaded Successfully\n')
 
-# =========================
+# ==========================================
 # FEATURE ENGINEERING
-# =========================
+# ==========================================
 
 df = perform_feature_engineering(df)
 
 print('Feature Engineering Completed\n')
 
-# =========================
+# ==========================================
 # FEATURES AND TARGET
-# =========================
+# ==========================================
 
 X = df.drop(
     'charges',
@@ -74,9 +81,9 @@ X = df.drop(
 
 y = df['charges']
 
-# =========================
+# ==========================================
 # TRAIN TEST SPLIT
-# =========================
+# ==========================================
 
 X_train, X_test, y_train, y_test = train_test_split(
 
@@ -90,15 +97,15 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 print('Train Test Split Completed\n')
 
-# =========================
-# PREPROCESSOR
-# =========================
+# ==========================================
+# CREATE PREPROCESSOR
+# ==========================================
 
 preprocessor = create_preprocessor()
 
-# =========================
+# ==========================================
 # INDIVIDUAL MODELS
-# =========================
+# ==========================================
 
 models = {
 
@@ -130,13 +137,13 @@ models = {
     )
 }
 
-# =========================
-# TRAIN & EVALUATE
-# =========================
+# ==========================================
+# MODEL EVALUATION
+# ==========================================
 
-print('==============================')
+print('=================================')
 print('INDIVIDUAL MODEL PERFORMANCE')
-print('==============================\n')
+print('=================================\n')
 
 for name, model in models.items():
 
@@ -156,20 +163,26 @@ for name, model in models.items():
         ]
     )
 
-    # Train
+    # ======================================
+    # TRAIN MODEL
+    # ======================================
 
     pipeline.fit(
         X_train,
         y_train
     )
 
-    # Prediction
+    # ======================================
+    # PREDICTIONS
+    # ======================================
 
     predictions = pipeline.predict(
         X_test
     )
 
-    # Metrics
+    # ======================================
+    # METRICS
+    # ======================================
 
     r2 = r2_score(
         y_test,
@@ -188,7 +201,9 @@ for name, model in models.items():
 
     rmse = mse ** 0.5
 
-    # Print Metrics
+    # ======================================
+    # PRINT RESULTS
+    # ======================================
 
     print(f'{name} Results\n')
 
@@ -200,4 +215,4 @@ for name, model in models.items():
 
     print('RMSE : ', rmse)
 
-    print('----------------------------\n')
+    print('-----------------------------\n')

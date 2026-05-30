@@ -1,8 +1,6 @@
 import sys
 import os
 
-# Add project root directory to Python path
-
 sys.path.append(
     os.path.abspath(
         os.path.join(
@@ -14,13 +12,9 @@ sys.path.append(
 
 import joblib
 
-from sklearn.model_selection import (
-    train_test_split
-)
+from sklearn.model_selection import train_test_split
 
-from sklearn.pipeline import (
-    Pipeline
-)
+from sklearn.pipeline import Pipeline
 
 from sklearn.ensemble import (
 
@@ -30,47 +24,31 @@ from sklearn.ensemble import (
     StackingRegressor
 )
 
-from sklearn.linear_model import (
-    LinearRegression
-)
+from sklearn.linear_model import LinearRegression
 
-from src.load_data import (
-    load_dataset
-)
+from src.load_data import load_dataset
 
-from src.preprocess import (
-    create_preprocessor
-)
+from src.preprocess import create_preprocessor
 
-from src.feature_engineering import (
-    perform_feature_engineering
-)
+from src.feature_engineering import perform_feature_engineering
 
-from utils.helper import (
-    evaluate_model
-)
-
-# =========================
-# LOAD DATASET
-# =========================
+# ======================
+# LOAD DATA
+# ======================
 
 df = load_dataset(
     'insurance.csv'
 )
 
-print('\nDataset Loaded Successfully\n')
-
-# =========================
+# ======================
 # FEATURE ENGINEERING
-# =========================
+# ======================
 
 df = perform_feature_engineering(df)
 
-print('Feature Engineering Completed\n')
-
-# =========================
+# ======================
 # FEATURES AND TARGET
-# =========================
+# ======================
 
 X = df.drop(
     'charges',
@@ -79,9 +57,9 @@ X = df.drop(
 
 y = df['charges']
 
-# =========================
+# ======================
 # TRAIN TEST SPLIT
-# =========================
+# ======================
 
 X_train, X_test, y_train, y_test = train_test_split(
 
@@ -93,37 +71,31 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-print('Train Test Split Completed\n')
-
-# =========================
+# ======================
 # PREPROCESSOR
-# =========================
+# ======================
 
 preprocessor = create_preprocessor()
 
-print('Preprocessor Created\n')
-
-# =========================
+# ======================
 # BASE LEARNERS
-# =========================
+# ======================
 
 base_learners = [
 
     (
-        'random_forest',
+        'rf',
 
         RandomForestRegressor(
 
             n_estimators=100,
-
-            max_depth=10,
 
             random_state=42
         )
     ),
 
     (
-        'gradient_boosting',
+        'gbr',
 
         GradientBoostingRegressor(
 
@@ -134,7 +106,7 @@ base_learners = [
     ),
 
     (
-        'extra_trees',
+        'etr',
 
         ExtraTreesRegressor(
 
@@ -145,15 +117,15 @@ base_learners = [
     )
 ]
 
-# =========================
+# ======================
 # META LEARNER
-# =========================
+# ======================
 
 meta_learner = LinearRegression()
 
-# =========================
-# STACKING REGRESSOR
-# =========================
+# ======================
+# STACKING MODEL
+# ======================
 
 stacking_model = StackingRegressor(
 
@@ -164,11 +136,9 @@ stacking_model = StackingRegressor(
     cv=5
 )
 
-print('Stacking Regressor Created\n')
-
-# =========================
+# ======================
 # PIPELINE
-# =========================
+# ======================
 
 pipeline = Pipeline(
 
@@ -186,54 +156,18 @@ pipeline = Pipeline(
     ]
 )
 
-# =========================
+# ======================
 # TRAIN MODEL
-# =========================
-
-print('Training Model...\n')
+# ======================
 
 pipeline.fit(
     X_train,
     y_train
 )
 
-print('Model Training Completed\n')
-
-# =========================
-# PREDICTIONS
-# =========================
-
-y_pred = pipeline.predict(
-    X_test
-)
-
-print('Prediction Completed\n')
-
-# =========================
-# EVALUATION
-# =========================
-
-mae, mse, rmse, r2 = evaluate_model(
-
-    y_test,
-    y_pred
-)
-
-print('==============================')
-print('MODEL EVALUATION METRICS')
-print('==============================\n')
-
-print('MAE : ', mae)
-
-print('MSE : ', mse)
-
-print('RMSE : ', rmse)
-
-print('R2 SCORE : ', r2)
-
-# =========================
+# ======================
 # SAVE MODEL
-# =========================
+# ======================
 
 joblib.dump(
 
@@ -242,4 +176,6 @@ joblib.dump(
     'models/stacking_regression_model.pkl'
 )
 
-print('\nModel Saved Successfully\n')
+print(
+    'Model Saved Successfully'
+)
