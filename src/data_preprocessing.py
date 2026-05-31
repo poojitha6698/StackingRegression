@@ -1,0 +1,59 @@
+from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+import joblib
+
+def preprocess(df, target_column):
+
+    X = df.drop(columns=[target_column])
+    y = df[target_column]
+
+    numerical_cols = X.select_dtypes(
+        include=["int64", "float64"]
+    ).columns
+
+    categorical_cols = X.select_dtypes(
+        include=["object"]
+    ).columns
+
+    numeric_pipeline = Pipeline([
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", StandardScaler())
+    ])
+
+    categorical_pipeline = Pipeline([
+        ("imputer", SimpleImputer(strategy="most_frequent")),
+        ("encoder", OneHotEncoder(handle_unknown="ignore"))
+    ])
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("num", numeric_pipeline, numerical_cols),
+            ("cat", categorical_pipeline, categorical_cols)
+        ]
+    )
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.2,
+        random_state=42
+    )
+
+    X_train = preprocessor.fit_transform(X_train)
+    X_test = preprocessor.transform(X_test)
+
+    joblib.dump(
+        preprocessor,
+        "artifacts/preprocessor.pkl"
+    )
+
+    return (
+        X_train,
+        X_test,
+        y_train,
+        y_test,
+        preprocessor
+    )

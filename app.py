@@ -1,267 +1,71 @@
 import streamlit as st
-
 import pandas as pd
-
 import joblib
 
-import os
-
-# ==========================================
-# IMPORT EDA FUNCTIONS
-# ==========================================
-
-from src.eda import (
-
-    charges_distribution,
-    bmi_vs_charges,
-    age_vs_charges
+st.set_page_config(
+    page_title="California Housing Predictor",
+    page_icon="🏠",
+    layout="wide"
 )
 
-# ==========================================
-# MODEL PATH
-# ==========================================
+model = joblib.load(
+    "artifacts/model.pkl"
+)
 
-MODEL_PATH = 'models/stacking_regression_model.pkl'
+preprocessor = joblib.load(
+    "artifacts/preprocessor.pkl"
+)
 
-# ==========================================
-# TRAIN MODEL IF MODEL DOES NOT EXIST
-# ==========================================
+st.title("🏠 California Housing Price Prediction")
 
-if not os.path.exists(MODEL_PATH):
+st.markdown("""
+Predict California House Prices using
 
-    st.warning(
-        'Model not found. Training model...'
+✅ Random Forest
+
+✅ Gradient Boosting
+
+✅ Stacking Regressor
+""")
+
+uploaded_file = st.file_uploader(
+    "Upload CSV File",
+    type=["csv"]
+)
+
+if uploaded_file:
+
+    data = pd.read_csv(
+        uploaded_file
     )
 
-    import models.train_model
+    st.subheader("Uploaded Data")
 
-# ==========================================
-# LOAD MODEL SAFELY
-# ==========================================
+    st.dataframe(data.head())
 
-try:
-
-    model = joblib.load(
-        MODEL_PATH
+    transformed = preprocessor.transform(
+        data
     )
 
-except Exception as e:
-
-    st.warning(
-        'Model incompatible or corrupted.'
+    predictions = model.predict(
+        transformed
     )
 
-    st.warning(
-        'Retraining model automatically...'
+    data["Predicted_House_Value"] = predictions
+
+    st.subheader("Predictions")
+
+    st.dataframe(
+        data.head()
     )
 
-    model = joblib.load(
-        'models/stacking_regression_model.pkl'
+    csv = data.to_csv(
+        index=False
     )
 
-    model = joblib.load(
-        MODEL_PATH
+    st.download_button(
+        "Download Predictions",
+        csv,
+        "predictions.csv",
+        "text/csv"
     )
-
-# ==========================================
-# LOAD DATASET
-# ==========================================
-
-df = pd.read_csv(
-    'insurance.csv'
-)
-
-# ==========================================
-# STREAMLIT PAGE TITLE
-# ==========================================
-
-st.title(
-    'Insurance Charges Prediction using Stacking Regression'
-)
-
-# ==========================================
-# DATASET PREVIEW
-# ==========================================
-
-st.header(
-    'Dataset Preview'
-)
-
-st.dataframe(
-    df.head()
-)
-
-# ==========================================
-# EDA SECTION
-# ==========================================
-
-st.header(
-    'Exploratory Data Analysis'
-)
-
-# ------------------------------------------
-# Charges Distribution
-# ------------------------------------------
-
-fig1 = charges_distribution(df)
-
-st.pyplot(fig1)
-
-# ------------------------------------------
-# BMI vs Charges
-# ------------------------------------------
-
-fig2 = bmi_vs_charges(df)
-
-st.pyplot(fig2)
-
-# ------------------------------------------
-# Age vs Charges
-# ------------------------------------------
-
-fig3 = age_vs_charges(df)
-
-st.pyplot(fig3)
-
-# ==========================================
-# USER INPUT SECTION
-# ==========================================
-
-st.header(
-    'Enter User Details'
-)
-
-# ------------------------------------------
-# Age
-# ------------------------------------------
-
-age = st.slider(
-
-    'Age',
-
-    18,
-
-    100,
-
-    25
-)
-
-# ------------------------------------------
-# Sex
-# ------------------------------------------
-
-sex = st.selectbox(
-
-    'Sex',
-
-    [
-        'male',
-        'female'
-    ]
-)
-
-# ------------------------------------------
-# BMI
-# ------------------------------------------
-
-bmi = st.slider(
-
-    'BMI',
-
-    10.0,
-
-    50.0,
-
-    25.0
-)
-
-# ------------------------------------------
-# Children
-# ------------------------------------------
-
-children = st.slider(
-
-    'Children',
-
-    0,
-
-    5,
-
-    0
-)
-
-# ------------------------------------------
-# Smoker
-# ------------------------------------------
-
-smoker = st.selectbox(
-
-    'Smoker',
-
-    [
-        'yes',
-        'no'
-    ]
-)
-
-# ------------------------------------------
-# Region
-# ------------------------------------------
-
-region = st.selectbox(
-
-    'Region',
-
-    [
-        'southwest',
-        'southeast',
-        'northwest',
-        'northeast'
-    ]
-)
-
-# ==========================================
-# CREATE INPUT DATAFRAME
-# ==========================================
-
-input_data = pd.DataFrame({
-
-    'age': [age],
-
-    'sex': [sex],
-
-    'bmi': [bmi],
-
-    'children': [children],
-
-    'smoker': [smoker],
-
-    'region': [region],
-
-    'bmi_age_interaction': [bmi * age]
-})
-
-# ==========================================
-# PREDICTION BUTTON
-# ==========================================
-
-if st.button(
-    'Predict Insurance Charges'
-):
-
-    prediction = model.predict(
-        input_data
-    )[0]
-
-    st.success(
-
-        f'Predicted Insurance Charges : ${prediction:.2f}'
-    )
-
-# ==========================================
-# FOOTER
-# ==========================================
-
-st.write(
-    'Stacking Regression Project using Streamlit'
-)
