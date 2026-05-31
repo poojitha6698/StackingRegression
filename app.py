@@ -1,32 +1,40 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import os
 
 st.set_page_config(
-    page_title="California Housing Predictor",
+    page_title="Stacking Regression",
     page_icon="🏠",
     layout="wide"
 )
 
+# Auto-train if model doesn't exist
+
+if (
+    not os.path.exists("model.pkl")
+    or
+    not os.path.exists("preprocessor.pkl")
+):
+
+    from train import train_pipeline
+
+    with st.spinner(
+        "Training model for first deployment..."
+    ):
+        train_pipeline()
+
 model = joblib.load(
-    "artifacts/model.pkl"
+    "model.pkl"
 )
 
 preprocessor = joblib.load(
-    "artifacts/preprocessor.pkl"
+    "preprocessor.pkl"
 )
 
-st.title("🏠 California Housing Price Prediction")
-
-st.markdown("""
-Predict California House Prices using
-
-✅ Random Forest
-
-✅ Gradient Boosting
-
-✅ Stacking Regressor
-""")
+st.title(
+    "🏠 California Housing Price Prediction"
+)
 
 uploaded_file = st.file_uploader(
     "Upload CSV File",
@@ -39,9 +47,13 @@ if uploaded_file:
         uploaded_file
     )
 
-    st.subheader("Uploaded Data")
+    st.subheader(
+        "Input Dataset"
+    )
 
-    st.dataframe(data.head())
+    st.dataframe(
+        data.head()
+    )
 
     transformed = preprocessor.transform(
         data
@@ -51,9 +63,13 @@ if uploaded_file:
         transformed
     )
 
-    data["Predicted_House_Value"] = predictions
+    data[
+        "Predicted_House_Value"
+    ] = predictions
 
-    st.subheader("Predictions")
+    st.subheader(
+        "Predictions"
+    )
 
     st.dataframe(
         data.head()
@@ -64,7 +80,7 @@ if uploaded_file:
     )
 
     st.download_button(
-        "Download Predictions",
+        "Download Results",
         csv,
         "predictions.csv",
         "text/csv"

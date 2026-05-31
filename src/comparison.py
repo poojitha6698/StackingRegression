@@ -7,11 +7,12 @@ from sklearn.ensemble import (
 from sklearn.metrics import r2_score
 
 def compare_models(
-        X_train,
-        X_test,
-        y_train,
-        y_test,
-        stacking_model):
+    X_train,
+    X_test,
+    y_train,
+    y_test,
+    stacking_model
+):
 
     models = {
 
@@ -33,19 +34,13 @@ def compare_models(
     for name, model in models.items():
 
         if name != "Stacking":
-
-            model.fit(
-                X_train,
-                y_train
-            )
+            model.fit(X_train, y_train)
 
         pred = model.predict(X_test)
 
-        score = r2_score(
+        results[name] = r2_score(
             y_test,
             pred
         )
-
-        results[name] = score
 
     return results

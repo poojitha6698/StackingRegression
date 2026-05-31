@@ -1,12 +1,14 @@
-from src.data_ingestion import load_data
+import pandas as pd
+import joblib
+import json
+
 from src.data_preprocessing import preprocess
 from src.model_trainer import train_model
 from src.evaluate import evaluate_model
-from src.comparison import compare_models
 
-def main():
+def train_pipeline():
 
-    df = load_data(
+    df = pd.read_csv(
         "data/housing.csv"
     )
 
@@ -33,19 +35,29 @@ def main():
         y_test
     )
 
-    comparison = compare_models(
-        X_train,
-        X_test,
-        y_train,
-        y_test,
-        model
+    joblib.dump(
+        model,
+        "model.pkl"
     )
 
-    print("\nMetrics")
-    print(metrics)
+    joblib.dump(
+        preprocessor,
+        "preprocessor.pkl"
+    )
 
-    print("\nModel Comparison")
-    print(comparison)
+    with open(
+        "metrics.json",
+        "w"
+    ) as file:
+
+        json.dump(
+            metrics,
+            file,
+            indent=4
+        )
+
+    return model, preprocessor
+
 
 if __name__ == "__main__":
-    main()
+    train_pipeline()

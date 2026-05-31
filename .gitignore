@@ -1,4 +1,5 @@
-artifacts/
+model.pkl
+preprocessor.pkl
+metrics.json
 __pycache__/
-*.pyc
 .ipynb_checkpoints/

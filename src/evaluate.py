@@ -5,49 +5,32 @@ from sklearn.metrics import (
 )
 
 import numpy as np
-import json
 
-def evaluate_model(
-        model,
-        X_test,
-        y_test):
+def evaluate_model(model, X_test, y_test):
 
-    preds = model.predict(X_test)
+    predictions = model.predict(X_test)
 
     mae = mean_absolute_error(
         y_test,
-        preds
+        predictions
     )
 
     mse = mean_squared_error(
         y_test,
-        preds
+        predictions
     )
 
     rmse = np.sqrt(mse)
 
     r2 = r2_score(
         y_test,
-        preds
+        predictions
     )
 
-    metrics = {
+    return {
 
-        "MAE": float(mae),
-        "MSE": float(mse),
-        "RMSE": float(rmse),
-        "R2": float(r2)
+        "MAE": mae,
+        "MSE": mse,
+        "RMSE": rmse,
+        "R2": r2
     }
-
-    with open(
-        "artifacts/metrics.json",
-        "w"
-    ) as file:
-
-        json.dump(
-            metrics,
-            file,
-            indent=4
-        )
-
-    return metrics
